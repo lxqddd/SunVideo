@@ -44,11 +44,11 @@ async function createWindow() {
     titleBarOverlay: {
       // symbolColor: '#fff',
       // color: '#3992ff'
-      height: 32
+      height: 32,
     },
     webPreferences: {
       preload,
-      webSecurity: false
+      webSecurity: false,
     },
   })
   win.setMenuBarVisibility(false)
@@ -75,26 +75,41 @@ async function createWindow() {
 app.whenReady().then(() => {
   createWindow()
   protocol.registerFileProtocol('local-file', (request, callback) => {
-    const url = request.url.substr(12);
-    callback({ path: path.normalize(url) });
+    const url = request.url.substr(12)
+    callback({ path: path.normalize(url) })
   })
 })
 
 ipcMain.handle('select:video', async () => {
   const result = await dialog.showOpenDialog(win, {
     properties: ['openFile'],
-    filters: [{ name: 'videos', extensions: ['mp4', 'avi', 'mkv'] }]
+    filters: [{ name: 'videos', extensions: ['mp4', 'avi', 'mkv'] }],
   })
   const paths = result.filePaths
-  const p = result.filePaths[0]
   if (result.canceled) {
     return []
-  } else {
+  }
+  else {
     return paths.map(path => ({
       path,
-      type: mime.getType(path)
+      type: mime.getType(path),
     }))
   }
+})
+
+ipcMain.on('request:videoStream', (e: Electron.IpcMainEvent, filePath: string) => {
+  const readStream = fs.createReadStream(filePath)
+  readStream.on('data', (chunk) => {
+    e.sender.send('video-stream-chunk', chunk)
+  })
+
+  readStream.on('end', () => {
+    e.sender.send('video-stream-end')
+  })
+
+  readStream.on('error', (error) => {
+    e.sender.send('video-stream-error', error)
+  })
 })
 
 app.on('ready', () => {
@@ -128,7 +143,7 @@ ipcMain.handle('open-win', (_, arg) => {
   const childWindow = new BrowserWindow({
     webPreferences: {
       preload,
-    }
+    },
   })
 
   if (VITE_DEV_SERVER_URL) {

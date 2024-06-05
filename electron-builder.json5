@@ -39,5 +39,8 @@
       "AppImage"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}"
+  },
+  "fileAssociations": {
+    "ext": ["mp4", "avi", "ogg", "webm"]
   }
 }
