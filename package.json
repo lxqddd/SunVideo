@@ -30,7 +30,7 @@
     "@antfu/eslint-config": "^2.20.0",
     "@types/fs-extra": "^11.0.4",
     "@vitejs/plugin-vue": "^5.0.4",
-    "electron": "^29.1.1",
+    "electron": "^30.0.9",
     "electron-builder": "^24.13.3",
     "eslint": "^9.4.0",
     "mime": "^4.0.3",
