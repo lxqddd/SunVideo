@@ -2,9 +2,9 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
-import { BrowserWindow, app, dialog, ipcMain, protocol, shell } from 'electron'
-import * as fs from 'fs-extra'
-import mime from 'mime'
+import { BrowserWindow, app, ipcMain, protocol, shell } from 'electron'
+import { restartStaticServer } from './src/server'
+import { selectFile } from './src/selectSource'
 
 // eslint-disable-next-line unused-imports/no-unused-vars
 const require = createRequire(import.meta.url)
@@ -42,8 +42,8 @@ async function createWindow() {
     frame: false,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      // symbolColor: '#fff',
-      // color: '#3992ff'
+      symbolColor: '#fff',
+      color: 'skyblue',
       height: 32,
     },
     webPreferences: {
@@ -80,39 +80,11 @@ app.whenReady().then(() => {
   })
 })
 
-ipcMain.handle('select:video', async () => {
-  const result = await dialog.showOpenDialog(win, {
-    properties: ['openFile'],
-    filters: [{ name: 'videos', extensions: ['mp4', 'avi', 'mkv'] }],
-  })
-  const paths = result.filePaths
-  if (result.canceled) {
-    return []
-  }
-  else {
-    return paths.map(path => ({
-      path,
-      type: mime.getType(path),
-    }))
-  }
-})
 
-ipcMain.on('request:videoStream', (e: Electron.IpcMainEvent, filePath: string) => {
-  const readStream = fs.createReadStream(filePath)
-  readStream.on('data', (chunk) => {
-    e.sender.send('video-stream-chunk', chunk)
-  })
 
-  readStream.on('end', () => {
-    e.sender.send('video-stream-end')
-  })
-
-  readStream.on('error', (error) => {
-    e.sender.send('video-stream-error', error)
-  })
-})
-
-app.on('ready', () => {
+app.on('ready', async () => {
+  await restartStaticServer('C:\\Users\\xiang\\Desktop\\video')
+  selectFile(win)
 })
 
 app.on('window-all-closed', () => {
