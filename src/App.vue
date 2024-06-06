@@ -28,10 +28,14 @@
             class="flex-1 w-100%"
             :data="videoList"
             node-key="name"
-            :props="{
-              label: 'name'
-            }"
-          />
+            accordion
+          >
+            <template #default="{ node, data }">
+              <span class="custom-tree-node">
+                <span>{{ node.name }}</span>
+              </span>
+            </template>
+          </el-tree>
         </div>
       </div>
     </div>
