@@ -1,5 +1,6 @@
-import { BrowserWindow, dialog, ipcMain } from "electron"
 import path from 'node:path'
+import type { BrowserWindow } from 'electron'
+import { dialog, ipcMain } from 'electron'
 import mime from 'mime'
 
 interface ISourceTree {
@@ -24,7 +25,7 @@ export function selectFile(win: BrowserWindow) {
     }
     else {
       const ret: ISourceTree[] = []
-      paths.forEach(_path => {
+      paths.forEach((_path) => {
         const { name, dir } = path.parse(_path)
         const dirName = path.basename(dir)
         const find = ret.find(item => item.name === dirName)
@@ -33,17 +34,18 @@ export function selectFile(win: BrowserWindow) {
             path: _path,
             type: mime.getType(_path),
             name,
-            dir
+            dir,
           })
-        } else {
+        }
+        else {
           ret.push({
             name: dirName,
             children: [{
               path: _path,
               type: mime.getType(_path),
               name,
-              dir
-            }]
+              dir,
+            }],
           })
         }
       })

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { BrowserWindow, app, ipcMain, protocol, shell } from 'electron'
-import { restartStaticServer } from './src/server'
+import { getVideoUrl } from './src/server'
 import { selectFile } from './src/selectSource'
 
 // eslint-disable-next-line unused-imports/no-unused-vars
@@ -80,11 +80,9 @@ app.whenReady().then(() => {
   })
 })
 
-
-
 app.on('ready', async () => {
-  await restartStaticServer('C:\\Users\\xiang\\Desktop\\video')
   selectFile(win)
+  getVideoUrl()
 })
 
 app.on('window-all-closed', () => {

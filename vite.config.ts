@@ -32,7 +32,8 @@ export default defineConfig(({ command }) => {
           onstart({ startup }) {
             if (process.env.VSCODE_DEBUG) {
               console.log(/* For `.vscode/.debug.script.mjs` */'[startup] Electron App')
-            } else {
+            }
+            else {
               startup()
             }
           },
@@ -51,7 +52,7 @@ export default defineConfig(({ command }) => {
           input: 'electron/preload/index.ts',
           vite: {
             build: {
-              sourcemap: sourcemap ? 'inline' : undefined, 
+              sourcemap: sourcemap ? 'inline' : undefined,
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {

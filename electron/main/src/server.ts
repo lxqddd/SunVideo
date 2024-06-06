@@ -1,10 +1,13 @@
-import express from 'express'
-import http from "http"
+import type http from 'node:http'
 import net from 'node:net'
+import path from 'node:path'
+import { ipcMain } from 'electron'
+import express from 'express'
 
 let server: http.Server
 let port: number = 3180
 let staticServerUrl: string = ''
+let currentStaticPath: string = ''
 
 function checkPortInUse() {
   return new Promise((resolve, reject) => {
@@ -20,10 +23,10 @@ function checkPortInUse() {
   })
 }
 
-async function startStaticServer(sourcePath: string): Promise<string> {
+async function startStaticServer(): Promise<string> {
   return new Promise(async (resolve, reject) => {
     const app = express()
-    app.use('/static', express.static(sourcePath))
+    app.use('/static', express.static(currentStaticPath))
     while (await checkPortInUse()) {
       port += 1
     }
@@ -38,13 +41,26 @@ async function startStaticServer(sourcePath: string): Promise<string> {
   })
 }
 
-export async function restartStaticServer(sourcePath: string) {
+async function restartStaticServer() {
   if (server) {
     server.close(async () => {
-      staticServerUrl = await startStaticServer(sourcePath)
+      staticServerUrl = await startStaticServer()
     })
-  } else {
-    staticServerUrl = await startStaticServer(sourcePath)
+  }
+  else {
+    staticServerUrl = await startStaticServer()
   }
   console.log(staticServerUrl)
+}
+
+export async function getVideoUrl() {
+  ipcMain.handle('video:url', async (_e, dir: string, videoPath: string) => {
+    console.log(dir, videoPath)
+    if (dir !== currentStaticPath) {
+      currentStaticPath = dir
+      await restartStaticServer()
+    }
+    const basename = path.basename(videoPath)
+    return `${staticServerUrl}${basename}`
+  })
 }
