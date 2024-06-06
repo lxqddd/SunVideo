@@ -24,7 +24,7 @@
             <el-button type="primary" @click="handleSelect">选择文件</el-button>
             <el-button type="primary" @click="handleSelect">选择目录</el-button>
           </div>
-          <el-tree
+          <!-- <el-tree
             class="flex-1 w-100%"
             :data="videoList"
             node-key="name"
@@ -35,7 +35,8 @@
                 <span>{{ node.name }}</span>
               </span>
             </template>
-          </el-tree>
+          </el-tree> -->
+          <Tree :data="videoList" />
         </div>
       </div>
     </div>
@@ -48,6 +49,7 @@ import type Player from 'video.js/dist/types/player'
 import 'video.js/dist/video-js.min.css'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { ISourceTree } from './types'
+import Tree from './components/Tree/index.vue'
 
 const videoPlayer = ref<HTMLVideoElement>()
 const player = ref<Player>()
