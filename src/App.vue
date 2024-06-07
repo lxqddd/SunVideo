@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import videojs from 'video.js'
-import type Player from 'video.js/dist/types/player'
-import 'video.js/dist/video-js.min.css'
+import { VideoPlayer } from '@videojs-player/vue'
+import 'video.js/dist/video-js.css'
+import '@videojs/themes/dist/forest/index.css'
 import { onMounted, onUnmounted, ref } from 'vue'
 import type { ISourceTree } from './types'
 
@@ -11,8 +11,11 @@ const defaultProps = {
 }
 
 const videoPlayer = ref<HTMLVideoElement>()
-const player = ref<Player>()
-const currentVideoUrl = ref('')
+// const player = ref<Player>()
+const currentVideo = ref<{
+  src: string
+  type: string
+}>()
 const videoList = ref<ISourceTree[]>([
   {
     name: '',
@@ -28,17 +31,13 @@ const videoList = ref<ISourceTree[]>([
 ])
 
 onMounted(() => {
-  player.value = videojs(videoPlayer.value!, {
-    playbackRates: [0.5, 1, 1.5, 2],
-    techOrder: ['html5'],
-  }, () => {
-    console.log('on player ready')
-  })
+  
 })
 
 async function handleSelect() {
   const res = await window.ipcRenderer.invoke('select:video')
   videoList.value = res
+  
   console.log(res)
 }
 
@@ -47,12 +46,26 @@ async function handleNodeClick(node) {
     return
 
   const ret = await window.ipcRenderer.invoke('video:url', node.dir, node.path)
-  currentVideoUrl.value = ret
-  console.log(ret)
+  currentVideo.value = {
+    type: node.type,
+    src: ret
+  }
+  // if (player.value) {
+  //   // player.value?.dispose()
+  //   player.value = undefined
+  // }
+  // player.value = videojs(videoPlayer.value!, {
+  //   playbackRates: [0.5, 1, 1.5, 2],
+  //   techOrder: ['html5'],
+  //   sources: [currentVideo.value]
+  // }, () => {
+  //   console.log('on player ready')
+  // })
+  console.log(currentVideo.value)
 }
 
 onUnmounted(() => {
-  player.value?.dispose()
+  // player.value?.dispose()
 })
 </script>
 
@@ -63,17 +76,18 @@ onUnmounted(() => {
     </div>
     <div class="flex flex-1">
       <div class="flex items-center justify-center flex-1">
-        <video
+        <video-player
           v-if="videoList.length"
-          ref="videoPlayer"
-          class="video-js vjs-default-skin w-100% h-100%"
+          class="video-js vjs-theme-forest w-100% h-100%"
           controls
+          crossorigin="anonymous"
           preload="auto"
+          :sources="[currentVideo]"
           :data-setup="{
           }"
         >
-          <source :src="currentVideoUrl" type="video/mp4">
-        </video>
+          <!-- <source :src="currentVideoUrl" type="video/mp4"> -->
+        </video-player>
         <div v-else>
           暂无可播放资源
         </div>

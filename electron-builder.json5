@@ -41,6 +41,6 @@
     "artifactName": "${productName}-Linux-${version}.${ext}"
   },
   "fileAssociations": {
-    "ext": ["mp4", "avi", "ogg", "webm"]
+    "ext": ["mp4", "avi", "ogg", "webm", "ogv", "m3u8"]
   }
 }
